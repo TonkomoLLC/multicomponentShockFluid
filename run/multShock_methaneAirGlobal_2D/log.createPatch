@@ -1,0 +1,70 @@
+/*---------------------------------------------------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  13
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+Build  : 13-65eda17ad4ca
+Exec   : createPatch
+Date   : Sep 29 2025
+Time   : 02:02:52
+Host   : "of13"
+PID    : 15302
+I/O    : uncollated
+Case   : /home/openfoam13/OF-13/methaneAirBurning_2D_multShock
+nProcs : 1
+sigFpe : Floating point exception trapping - not supported on this platform
+fileModificationChecking : Monitoring run-time modified files using timeStampMaster (fileModificationSkew 10)
+allowSystemOperations : Allowing user-supplied system call operations
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+Create time
+
+Create mesh for time = 0
+
+Reading "createPatchDict"
+
+Adding new patch left as patch 6 from 
+{
+    type            patch;
+}
+
+Adding new patch right as patch 7 from 
+{
+    type            patch;
+}
+
+Adding new patch wallsY as patch 8 from 
+{
+    type            wall;
+}
+
+Adding new patch wallsZ as patch 9 from 
+{
+    type            empty;
+}
+
+
+Moving faces from patch minX to patch 6
+Moving faces from patch maxX to patch 7
+Moving faces from patch minY to patch 8
+Moving faces from patch maxY to patch 8
+Moving faces from patch minZ to patch 9
+Moving faces from patch maxZ to patch 9
+
+Doing topology modification to order faces.
+
+Removing patches with no faces in them.
+
+Removing zero-sized patch minX type patch at position 0
+Removing zero-sized patch maxX type patch at position 1
+Removing zero-sized patch minY type patch at position 2
+Removing zero-sized patch maxY type patch at position 3
+Removing zero-sized patch minZ type patch at position 4
+Removing zero-sized patch maxZ type patch at position 5
+Removing patches.
+Writing repatched mesh to 0
+
+End
+

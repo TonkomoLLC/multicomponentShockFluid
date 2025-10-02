@@ -1,0 +1,44 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  13
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      setFieldsDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+defaultValues
+{
+    p       1e5;
+    T       300;
+}
+
+high 1e5;
+low -1e5;
+
+zones
+{
+    hotSpot
+    {
+        type        box;
+        zoneType    cell;
+
+        box (0 $low $low) (2 $high $high);
+
+        values
+        {
+            p 15e5; 
+            T 2400;
+        }
+    }
+}
+
+
+// ************************************************************************* //

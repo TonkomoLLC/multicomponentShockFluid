@@ -1,0 +1,45 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  13
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    format          ascii;
+    class           dictionary;
+    location        "system";
+    object          sample;
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+type sets;
+libs            ("libsampling.so");
+
+interpolationScheme cellPoint;
+
+setFormat raw;
+
+start           (0 0 0);
+end             (20 0 0);
+
+fields          (T U p O2);
+
+axis            x; // The independent variable of the graph. Can be "x",
+                          // "y", "z", "xyz" (all coordinates written out), or
+                          // "distance" (from the start point).
+
+sets
+{
+    line
+    {
+        type            lineCell;
+        axis            $axis;
+        start           $start;
+        end             $end;
+    }
+}
+
+// ************************************************************************* //
