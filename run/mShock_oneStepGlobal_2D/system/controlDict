@@ -10,35 +10,42 @@ FoamFile
     format      ascii;
     class       dictionary;
     location    "system";
-    object      setFieldsDict;
+    object      controlDict;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-defaultValues
-{
-    p       1e5;
-    T       300;
-}
+solver          multicomponentShockFluid;
 
-high 1e5;
-low -1e5;
+startFrom       latestTime;
 
-zones
-{
-    hotSpot
-    {
-        type        box;
-        zoneType    cell;
+startTime       0;
 
-        box (0 $low $low) (2 $high $high);
+stopAt          endTime;
 
-        values
-        {
-            p 15e5; 
-            T 2400;
-        }
-    }
-}
+endTime         3e-3;
 
+deltaT          1e-6;
+
+writeControl    adjustableRunTime;
+
+writeInterval   1e-5;
+
+purgeWrite      0;
+
+writeFormat     binary;
+
+writePrecision  6;
+
+writeCompression off;
+
+timeFormat      general;
+
+timePrecision   6;
+
+runTimeModifiable true;
+
+adjustTimeStep  yes;
+
+maxCo           0.2;
 
 // ************************************************************************* //

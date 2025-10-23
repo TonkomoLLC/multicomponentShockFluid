@@ -8,40 +8,36 @@
 FoamFile
 {
     format      ascii;
-    class       volScalarField;
-    location    "0";
-    object      CH4;
+    class       dictionary;
+    location    "system";
+    object      setFieldsDict;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-dimensions      [];
-
-internalField   uniform 0.05;
-
-boundaryField
+defaultValues
 {
-    #includeEtc "caseDicts/setConstraintTypes"
+    p       1e5;
+    T       300;
+}
 
-    left
+high 1e5;
+low -1e5;
+
+zones
+{
+    hotSpot
     {
-        type            zeroGradient;
+        type        box;
+        zoneType    cell;
+
+        box (0 $low $low) (0.5 $high $high);
+
+        values
+        {
+            p 25e5; 
+            T 1500;
+        }
     }
-
-    right
-    {
-        type            waveTransmissive;
-        gamma           1.4;
-        fieldInf        0.05;
-        lInf            1e3;
-
-        // type            zeroGradient;
-    }
-
-    empty
-    {
-        type            empty;
-    }
-
 }
 
 

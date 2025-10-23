@@ -16,13 +16,13 @@ FoamFile
 convertToMeters 1;
 
 xmin  0;
-xmax  10; //1.28;
-ymin  -1;
-ymax   1;
+xmax  1; //1.28;
+ymin  -0.1;
+ymax   0.1;
 zmin  -0.1;
 zmax   0.1;
 
-deltax 0.01;
+deltax 0.001;
 deltay $deltax;
 // deltaz 0.5;
 

@@ -9,24 +9,36 @@ FoamFile
 {
     format      ascii;
     class       dictionary;
-    location    "constant";
-    object      physicalProperties;
+    location    "system";
+    object      setFieldsDict;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-thermoType
+defaultValues
 {
-    type            hePsiThermo; // heRhoThermo hePsiThermo
-    mixture         multicomponentMixture; //coefficientWilkeMulticomponentMixture;
-    transport       const;
-    thermo          hConst;
-    energy          sensibleInternalEnergy;
-    equationOfState perfectGas;
-    specie          specie;
+    p       1e5;
+    T       300;
 }
 
-defaultSpecie N2;
+high 1e5;
+low -1e5;
 
-#include "thermo.compressibleGas"
+zones
+{
+    hotSpot
+    {
+        type        box;
+        zoneType    cell;
+
+        box (0 $low $low) (0.5 $high $high);
+
+        values
+        {
+            p 13e5; 
+            T 1500;
+        }
+    }
+}
+
 
 // ************************************************************************* //

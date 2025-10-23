@@ -10,18 +10,36 @@ FoamFile
     format      ascii;
     class       dictionary;
     location    "system";
-    object      decomposeParDict;
+    object      setFieldsDict;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-
-numberOfSubdomains 6;
-
-method             simple;
-
-simpleCoeffs
+defaultValues
 {
-    n              (6 1 1);
+    p       1e5;
+    T       300;
 }
+
+high 1e5;
+low -1e5;
+
+zones
+{
+    hotSpot
+    {
+        type        box;
+        zoneType    cell;
+
+        // box (0 $low $low) (1 $high $high);
+        box (0 $low $low) (0.2 0 $high);
+
+        values
+        {
+            p 2.6e5; 
+            T 780;
+        }
+    }
+}
+
 
 // ************************************************************************* //

@@ -8,40 +8,20 @@
 FoamFile
 {
     format      ascii;
-    class       volScalarField;
-    location    "0";
-    object      O2;
+    class       dictionary;
+    location    "system";
+    object      decomposeParDict;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-dimensions      [];
 
-internalField   uniform 0.45;
+numberOfSubdomains 8;
 
-boundaryField
+method             simple;
+
+simpleCoeffs
 {
-    #includeEtc "caseDicts/setConstraintTypes"
-
-    left
-    {
-        type            zeroGradient;
-    }
-
-    right
-    {
-        type            waveTransmissive;
-        gamma           1.4;
-        fieldInf        0.45;
-        lInf            1e3;
-
-        // type            zeroGradient;
-    }
-
-    empty
-    {
-        type            empty;
-    }
+    n              (8 1 1);
 }
-
 
 // ************************************************************************* //

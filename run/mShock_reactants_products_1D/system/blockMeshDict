@@ -15,7 +15,7 @@ FoamFile
 
 convertToMeters 1;
 
-L   20;
+L   10;
 N   1000;
 
 vertices

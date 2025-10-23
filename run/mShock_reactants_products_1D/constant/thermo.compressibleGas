@@ -5,40 +5,47 @@
     \\  /    A nd           | Version:  13
      \\/     M anipulation  |
 \*---------------------------------------------------------------------------*/
-FoamFile
-{
-    format      ascii;
-    class       dictionary;
-    location    "system";
-    object      setFieldsDict;
-}
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-defaultValues
-{
-    p       1e5;
-    T       300;
-}
+species
+(
+    reactants
+    products
+);
 
-high 1e5;
-low -1e5;
-
-zones
+reactants
 {
-    hotSpot
+    specie
     {
-        type        box;
-        zoneType    cell;
-
-        box (0 $low $low) (2 $high $high);
-
-        values
-        {
-            p 5e5; 
-            T 1500;
-        }
+        molWeight       16;
+    }
+    thermodynamics
+    {
+        Cp          1040;
+        hf          0;
+    }
+    transport
+    {
+        mu          1.82e-05;
+        Pr          0.71;
     }
 }
 
+products
+{
+    specie
+    {
+        molWeight       16;
+    }
+    thermodynamics
+    {
+        Cp          1040;
+        hf          -1e6;
+    }
+    transport
+    {
+        mu          1.82e-05;
+        Pr          0.71;
+    }
+}
 
 // ************************************************************************* //

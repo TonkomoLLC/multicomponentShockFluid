@@ -8,40 +8,25 @@
 FoamFile
 {
     format      ascii;
-    class       volScalarField;
-    location    "0";
-    object      N2;
+    class       dictionary;
+    location    "constant";
+    object      physicalProperties;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-dimensions      [];
-
-internalField   uniform 0.5;
-
-boundaryField
+thermoType
 {
-    #includeEtc "caseDicts/setConstraintTypes"
-
-    left
-    {
-        type            zeroGradient;
-    }
-
-    right
-    {
-        type            waveTransmissive;
-        gamma           1.4;
-        fieldInf        0.5;
-        lInf            1e3;
-
-        // type            zeroGradient;
-    }
-
-    empty
-    {
-        type            empty;
-    }
+    type            hePsiThermo; // heRhoThermo hePsiThermo
+    mixture         multicomponentMixture; //coefficientWilkeMulticomponentMixture;
+    transport       const;
+    thermo          hConst;
+    energy          sensibleInternalEnergy;
+    equationOfState perfectGas;
+    specie          specie;
 }
 
+defaultSpecie reactants;
+
+#include "thermo.compressibleGas"
 
 // ************************************************************************* //
