@@ -60,8 +60,8 @@ interpolationSchemes
     reconstruct(rho) vanLeer;
     reconstruct(U)   vanLeerV; //linearUpwindV grad(U); //upwind; //vanLeerV;
     reconstruct(T)   vanLeer;
-    reconstruct(Yi)
-    
+    reconstruct(Yi)  vanLeer;
+        
     // reconstruct(rho) linearUpwind grad(U);
     // reconstruct(U)   linearUpwindV grad(U); //upwind; //vanLeerV;
     // reconstruct(T)   linearUpwind grad(U);
