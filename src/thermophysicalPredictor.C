@@ -52,8 +52,8 @@ void Foam::solvers::multicomponentShockFluid::thermophysicalPredictor()
         if (thermo_.solveSpecie(i))
         {
             const word YiName = "Yi";
-            const surfaceScalarField Yi_pos(interpolate(Yi, pos, YiName));
-            const surfaceScalarField Yi_neg(interpolate(Yi, neg, YiName));
+            const surfaceScalarField Yi_pos(interpolate(Yi, pos(), YiName));
+            const surfaceScalarField Yi_neg(interpolate(Yi, neg(), YiName));
 
             surfaceScalarField phiYi
             (
@@ -95,8 +95,8 @@ void Foam::solvers::multicomponentShockFluid::thermophysicalPredictor()
 
     volScalarField& e = thermo_.he();
 
-    const surfaceScalarField e_pos(interpolate(e, pos, thermo.T().name()));
-    const surfaceScalarField e_neg(interpolate(e, neg, thermo.T().name()));
+    const surfaceScalarField e_pos(interpolate(e, pos(), thermo.T().name()));
+    const surfaceScalarField e_neg(interpolate(e, neg(), thermo.T().name()));
 
     surfaceScalarField phiEp
     (

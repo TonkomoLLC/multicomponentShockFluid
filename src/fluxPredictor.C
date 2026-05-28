@@ -49,6 +49,32 @@ void Foam::solvers::multicomponentShockFluid::fluxPredictor()
     rho_pos = interpolate(rho, pos());
     rho_neg = interpolate(rho, neg());
 
+    // Reconstructed density can overshoot on strong shocks.  Do not use a
+    // near-zero generic SMALL floor here: if rhoU remains finite, that creates
+    // enormous face velocities and collapses deltaT.  Instead bound the face
+    // states by the current physical cell-density range.
+    const scalar rhoMinValue = max(SMALL, gMin(rho.primitiveField()));
+    const scalar rhoMaxValue = max(rhoMinValue, gMax(rho.primitiveField()));
+
+    const dimensionedScalar rhoMin
+    (
+        "rhoMin",
+        rho.dimensions(),
+        rhoMinValue
+    );
+
+    const dimensionedScalar rhoMax
+    (
+        "rhoMax",
+        rho.dimensions(),
+        rhoMaxValue
+    );
+
+    rho_pos.ref().max(rhoMin);
+    rho_pos.ref().min(rhoMax);
+    rho_neg.ref().max(rhoMin);
+    rho_neg.ref().min(rhoMax);
+
     const volVectorField rhoU(rho*U);
     rhoU_pos = interpolate(rhoU, pos(), U.name());
     rhoU_neg = interpolate(rhoU, neg(), U.name());
