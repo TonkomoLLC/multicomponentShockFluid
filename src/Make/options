@@ -1,12 +1,10 @@
 EXE_INC = \
-    -I$(FOAM_MODULES)/fluidSolver/lnInclude \
+    -I$(FOAM_MODULES)/basicFluidSolver/lnInclude \
     -I$(LIB_SRC)/physicalProperties/lnInclude \
     -I$(LIB_SRC)/thermophysicalModels/basic/lnInclude \
     -I$(LIB_SRC)/thermophysicalModels/specie/lnInclude \
     -I$(LIB_SRC)/thermophysicalModels/multicomponentThermo/lnInclude \
-    -I$(LIB_SRC)/thermophysicalModels/chemistryModel/lnInclude \
-    -I$(LIB_SRC)/ODE/lnInclude \
-    -I$(LIB_SRC)/combustionModels/lnInclude \
+    -I$(LIB_SRC)/reactionModels/lnInclude \
     -I$(LIB_SRC)/MomentumTransportModels/momentumTransportModels/lnInclude \
     -I$(LIB_SRC)/MomentumTransportModels/compressible/lnInclude \
     -I$(LIB_SRC)/ThermophysicalTransportModels/thermophysicalTransportModel/lnInclude \
@@ -14,14 +12,13 @@ EXE_INC = \
     -I$(LIB_SRC)/ThermophysicalTransportModels/fluidMulticomponentThermo/lnInclude \
     -I$(LIB_SRC)/finiteVolume/cfdTools \
     -I$(LIB_SRC)/finiteVolume/lnInclude \
-    -I$(LIB_SRC)/meshTools/lnInclude \
-    -I$(LIB_SRC)/sampling/lnInclude
-
+    -I$(LIB_SRC)/meshTools/lnInclude
 
 LIB_LIBS = \
-    -lfluidSolver \
+    -lbasicFluidSolver \
     -lfluidThermophysicalModels \
     -lmulticomponentThermophysicalModels \
+    -lreactionModels \
     -lmomentumTransportModels \
     -lcompressibleMomentumTransportModels \
     -lcoupledThermophysicalTransportModels \
@@ -29,9 +26,4 @@ LIB_LIBS = \
     -lfiniteVolume \
     -lmeshTools \
     -lfvModels \
-    -lfvConstraints \
-    -lspecie \
-    -lchemistryModel \
-    -lODE \
-    -lcombustionModels \
-    -lsampling
+    -lfvConstraints

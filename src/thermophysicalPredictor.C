@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     | Website:  https://openfoam.org
-    \\  /    A nd           | Copyright (C) 2023 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2023-2026 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -32,17 +32,6 @@ License
 
 void Foam::solvers::multicomponentShockFluid::thermophysicalPredictor()
 {
-    // tmp<fv::convectionScheme<scalar>> mvConvection
-    // (
-    //     fv::convectionScheme<scalar>::New
-    //     (
-    //         mesh,
-    //         fields,
-    //         phi,
-    //         mesh.schemes().div("div(phi,Yi)")
-    //     )
-    // );
-
     reaction->correct();
 
     forAll(Y, i)
@@ -51,20 +40,20 @@ void Foam::solvers::multicomponentShockFluid::thermophysicalPredictor()
 
         if (thermo_.solveSpecie(i))
         {
-            const word YiName = "Yi";
-            const surfaceScalarField Yi_pos(interpolate(Yi, pos(), YiName));
-            const surfaceScalarField Yi_neg(interpolate(Yi, neg(), YiName));
+            const word YiName("Yi");
+            const surfaceScalarField Yi_pos(interpolate(Yi, pos, YiName));
+            const surfaceScalarField Yi_neg(interpolate(Yi, neg, YiName));
 
-            surfaceScalarField phiYi
+            const surfaceScalarField phiYi
             (
                 "phiYi",
-                aphiv_pos()*rho_pos()*Yi_pos + aphiv_neg()*rho_neg()*Yi_neg
+                aphiv_pos()*rho_pos()*Yi_pos
+              + aphiv_neg()*rho_neg()*Yi_neg
             );
-            
+
             fvScalarMatrix YiEqn
             (
                 fvm::ddt(rho, Yi)
-            //   + mvConvection->fvmDiv(phi, Yi)
               + fvc::div(phiYi)
              ==
                 reaction->R(Yi)
@@ -95,8 +84,8 @@ void Foam::solvers::multicomponentShockFluid::thermophysicalPredictor()
 
     volScalarField& e = thermo_.he();
 
-    const surfaceScalarField e_pos(interpolate(e, pos(), thermo.T().name()));
-    const surfaceScalarField e_neg(interpolate(e, neg(), thermo.T().name()));
+    const surfaceScalarField e_pos(interpolate(e, pos, thermo.T().name()));
+    const surfaceScalarField e_neg(interpolate(e, neg, thermo.T().name()));
 
     surfaceScalarField phiEp
     (
@@ -106,7 +95,7 @@ void Foam::solvers::multicomponentShockFluid::thermophysicalPredictor()
       + aSf()*(p_pos() - p_neg())
     );
 
-    // Make flux for pressure-work absolute
+    // Make flux for pressure work absolute
     if (mesh.moving())
     {
         phiEp += mesh.phi()*(a_pos()*p_pos() + a_neg()*p_neg());

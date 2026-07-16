@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     | Website:  https://openfoam.org
-    \\  /    A nd           | Copyright (C) 2023-2025 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2023-2026 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -25,43 +25,34 @@ Class
     Foam::solvers::multicomponentShockFluid
 
 Description
-    Solver module for density-based solution of compressible flow
+    Solver module for density-based solution of compressible reacting
+    multicomponent flow.
 
-    Based on central-upwind schemes of Kurganov and Tadmor with support for
-    mesh-motion and topology change.
+    The convective mass, momentum, species and total-energy fluxes use the
+    central-upwind formulation of shockFluid. Species diffusion, heat
+    conduction and gas-phase reactions use the OpenFOAM multicomponent
+    thermophysical-transport and reaction-model frameworks.
 
-    Reference:
-    \verbatim
-        Greenshields, C. J., Weller, H. G., Gasparini, L.,
-        & Reese, J. M. (2010).
-        Implementation of semi‐discrete, non‐staggered central schemes
-        in a colocated, polyhedral, finite volume framework,
-        for high‐speed viscous flows.
-        International journal for numerical methods in fluids, 63(1), 1-21.
-    \endverbatim
+    Mesh motion and topology change are supported.
 
 SourceFiles
     multicomponentShockFluid.C
 
 See also
-    Foam::solvers::fluidSolver
-    Foam::solvers::incompressibleFluid
+    Foam::solvers::basicFluidSolver
+    Foam::solvers::shockFluid
+    Foam::solvers::multicomponentFluid
 
 \*---------------------------------------------------------------------------*/
 
 #ifndef multicomponentShockFluid_H
 #define multicomponentShockFluid_H
 
-#include "fluidSolver.H"
-// #include "psiThermo.H"
-#include "compressibleMomentumTransportModel.H"
-// #include "fluidThermoThermophysicalTransportModel.H"
-
+#include "basicFluidSolver.H"
 #include "psiMulticomponentThermo.H"
-#include "combustionModel.H"
+#include "compressibleMomentumTransportModel.H"
+#include "reactionModel.H"
 #include "fluidMulticomponentThermophysicalTransportModel.H"
-#include "multivariateScheme.H"
-
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -71,28 +62,28 @@ namespace solvers
 {
 
 /*---------------------------------------------------------------------------*\
-                          Class multicomponentShockFluid Declaration
+                    Class multicomponentShockFluid Declaration
 \*---------------------------------------------------------------------------*/
 
 class multicomponentShockFluid
 :
-    public fluidSolver
+    public basicFluidSolver
 {
 
 protected:
 
     // Thermophysical properties
 
-        //- Pointer to the fluid thermophysical properties
+        //- Pointer to the multicomponent fluid thermophysical properties
         autoPtr<psiMulticomponentThermo> thermoPtr_;
 
-        //- Reference to the fluid thermophysical properties
+        //- Reference to the multicomponent fluid thermophysical properties
         psiMulticomponentThermo& thermo_;
 
         //- Reference to the pressure field
         volScalarField& p_;
 
-        //- The continuity density field
+        //- Continuity density field
         volScalarField rho_;
 
 
@@ -104,32 +95,35 @@ protected:
         //- Mass-flux field
         surfaceScalarField phi_;
 
-        //- Kinetic energy field
-        //  Used in the energy equation
+        //- Kinetic energy field used in the energy equation
         volScalarField K;
 
-        
-        // Momentum transport
-        
+
+    // Momentum transport
+
+        //- True when molecular viscosity is zero
         bool inviscid;
-        
-        //- Pointer to the momentum transport model
+
+        //- Momentum transport model
+        //  Constructed in all cases because reactionModel requires it.
         autoPtr<compressible::momentumTransportModel> momentumTransport;
-        
+
 
     // Composition
 
+        //- Species mass-fraction fields
         PtrList<volScalarField>& Y_;
 
 
     // Reactions
 
-        autoPtr<combustionModel> reaction;
-        multivariateSurfaceInterpolationScheme<scalar>::fieldTable fields;
+        //- Gas-phase reaction model
+        autoPtr<reactionModel> reaction;
 
-        
+
     // Thermophysical transport
 
+        //- Multicomponent species and heat transport model
         autoPtr<fluidMulticomponentThermophysicalTransportModel>
             thermophysicalTransport;
 
@@ -220,7 +214,7 @@ public:
 
     // Public Data
 
-        //- Reference to the fluid thermophysical properties
+        //- Reference to the multicomponent fluid thermophysical properties
         const psiMulticomponentThermo& thermo;
 
         //- Reference to the pressure field
@@ -235,8 +229,9 @@ public:
         //- Reference to the mass-flux field
         const surfaceScalarField& phi;
 
-        //- Reference to the composition
+        //- Reference to the species mass-fraction fields
         const PtrList<volScalarField>& Y;
+
 
     //- Runtime type information
     TypeName("multicomponentShockFluid");
@@ -278,9 +273,7 @@ public:
         //- Construct and optionally solve the momentum equation
         virtual void momentumPredictor();
 
-        //- Construct and solve the energy equation,
-        //  convert to temperature
-        //  and update thermophysical and transport properties
+        //- Solve species and energy equations and update properties
         virtual void thermophysicalPredictor();
 
         //- Construct and solve the pressure equation in the PISO loop

@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     | Website:  https://openfoam.org
-    \\  /    A nd           | Copyright (C) 2023-2025 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2023-2026 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -47,7 +47,10 @@ namespace solvers
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
-void Foam::solvers::multicomponentShockFluid::correctCoNum(const surfaceScalarField& amaxSf)
+void Foam::solvers::multicomponentShockFluid::correctCoNum
+(
+    const surfaceScalarField& amaxSf
+)
 {
     const scalarField sumAmaxSf(fvc::surfaceSum(amaxSf)().primitiveField());
 
@@ -96,7 +99,7 @@ void Foam::solvers::multicomponentShockFluid::clearTemporaryFields()
 
 Foam::solvers::multicomponentShockFluid::multicomponentShockFluid(fvMesh& mesh)
 :
-    fluidSolver(mesh),
+    basicFluidSolver(mesh),
 
     thermoPtr_(psiMulticomponentThermo::New(mesh)),
 
@@ -114,7 +117,7 @@ Foam::solvers::multicomponentShockFluid::multicomponentShockFluid(fvMesh& mesh)
             IOobject::READ_IF_PRESENT,
             IOobject::AUTO_WRITE
         ),
-        thermo_.renameRho() // thermo_.rho() thermo_.p()*thermo_.psi() thermo_.renameRho()
+        thermo_.renameRho()
     ),
 
     U_
@@ -127,7 +130,8 @@ Foam::solvers::multicomponentShockFluid::multicomponentShockFluid(fvMesh& mesh)
             IOobject::MUST_READ,
             IOobject::AUTO_WRITE
         ),
-        mesh
+        mesh,
+        dimensions::velocity
     ),
 
     phi_
@@ -144,19 +148,18 @@ Foam::solvers::multicomponentShockFluid::multicomponentShockFluid(fvMesh& mesh)
     ),
 
     K("K", 0.5*magSqr(U_)),
-    
+
     inviscid
     (
         max(thermo_.mu().primitiveField()) > 0
-        ? false
-        : true
+      ? false
+      : true
     ),
-    
+
+    // reactionModel requires a momentum-transport model reference, so the
+    // model is constructed even for a zero-viscosity/inviscid calculation.
     momentumTransport
     (
-//        inviscid
-//        ? autoPtr<compressibleMomentumTransportModel>(nullptr)
-//        : compressible::momentumTransportModel::New
         compressible::momentumTransportModel::New
         (
             rho_,
@@ -165,16 +168,13 @@ Foam::solvers::multicomponentShockFluid::multicomponentShockFluid(fvMesh& mesh)
             thermo_
         )
     ),
-    
+
     Y_(thermo_.Y()),
 
-    reaction(combustionModel::New(thermo_, momentumTransport())),
+    reaction(reactionModel::New(thermo_, momentumTransport())),
 
     thermophysicalTransport
     (
-//        inviscid
-//      ? autoPtr<fluidMulticomponentThermophysicalTransportModel>(nullptr)
-//      : fluidMulticomponentThermophysicalTransportModel::New
         fluidMulticomponentThermophysicalTransportModel::New
         (
             momentumTransport(),
@@ -184,7 +184,7 @@ Foam::solvers::multicomponentShockFluid::multicomponentShockFluid(fvMesh& mesh)
 
     fluxScheme
     (
-        mesh.schemes().dict().lookupOrDefault<word>("fluxScheme", "Kurganov")
+        mesh.schemes().lookupOrDefault<word>("fluxScheme", "Kurganov")
     ),
 
     thermo(thermo_),
@@ -194,22 +194,10 @@ Foam::solvers::multicomponentShockFluid::multicomponentShockFluid(fvMesh& mesh)
     phi(phi_),
     Y(Y_)
 {
-    
-    //inviscid = true; 
-    
     thermo.validate(type(), "e");
 
-    if (momentumTransport.valid())
-    {
-        momentumTransport->validate();
-        mesh.schemes().setFluxRequired(U.name());
-    }
-
-    forAll(Y, i)
-    {
-        fields.add(Y[i]);
-    }
-    // fields.add(thermo.he());
+    momentumTransport->validate();
+    mesh.schemes().setFluxRequired(U.name());
 
     fluxPredictor();
 
@@ -283,7 +271,7 @@ void Foam::solvers::multicomponentShockFluid::preSolve()
         clearTemporaryFields();
     }
 
-    // Update the mesh for topology change, mesh to mesh mapping
+    // Update the mesh for topology change and mesh-to-mesh mapping
     mesh_.update();
 }
 
